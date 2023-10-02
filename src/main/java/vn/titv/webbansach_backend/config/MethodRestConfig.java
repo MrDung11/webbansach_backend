@@ -13,41 +13,44 @@ import vn.titv.webbansach_backend.entity.TheLoai;
 
 @Configuration
 public class MethodRestConfig implements RepositoryRestConfigurer {
-    private String url ="http://localhost:8080";
+    private String url = "http://localhost:3000";
 
     @Autowired
     private EntityManager entityManager;
 
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
-        HttpMethod[] chanCacPhuongThuc = {
-                HttpMethod.POST,
-                HttpMethod.PUT,
-                HttpMethod.PATCH,
-                HttpMethod.DELETE,
-        };
-
         // expose ids
-        // cho phep id trong khi tra ve json
-        // Tat ca
-//        config.exposeIdsFor(entityManager.getMetamodel().getEntities().stream().map(Type::getJavaType).toArray(Class[]::new));
+        // Cho phep tra ve id
+        config.exposeIdsFor(entityManager.getMetamodel().getEntities().stream().map(Type::getJavaType).toArray(Class[]::new));
 
-        // Loai class nao duoc chi dinh
-        // config.exposeIdsFor(TheLoai.class)
+        // config.exposeIdsFor(TheLoai.class);
+
+        // Cách cho font-end truy cập vào phương thức nào? Từ Url nào?
+        // CORS configuration
+        // Tất cả: /**
+        cors.addMapping("/**")
+                .allowedOrigins(url)
+                .allowedMethods("GET", "POST", "PUT", "DELETE");
+
+        // Chan cac Method
+        HttpMethod[] chanCacPhuongThuc = {HttpMethod.POST, HttpMethod.PUT, HttpMethod.PATCH, HttpMethod.DELETE};
+
 
         // disable cai nao di: tat ca hoc tung cai; cho phep nguoi dung nao truy cap
-//        disableHttpMethods(TheLoai.class, config, chanCacPhuongThuc);
-//
-//        HttpMethod[] phuongThucDelete = {
-//                HttpMethod.DELETE
-//        };
-//        disableHttpMethods(NguoiDung.class, config, phuongThucDelete);
+        disableHttpMethods(TheLoai.class, config, chanCacPhuongThuc);
+
+        // Chặn Method Delete
+        HttpMethod[] phuongThucDelete = {
+                HttpMethod.DELETE
+        };
+        disableHttpMethods(NguoiDung.class, config, phuongThucDelete);
     }
 
     // Quy dinh pham vi
     private void disableHttpMethods(Class c,
-                                 RepositoryRestConfiguration config,
-                                 HttpMethod[] methods){
+                                    RepositoryRestConfiguration config,
+                                    HttpMethod[] methods) {
         config.getExposureConfiguration()
                 .forDomainType(c)
                 .withItemExposure(((metdata, httpMethods) -> httpMethods.disable(methods)))
