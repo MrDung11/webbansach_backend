@@ -11,8 +11,18 @@ import vn.titv.webbansach_backend.entity.Sach;
 @RepositoryRestResource(path = "sach")
 public interface SachRepository extends JpaRepository<Sach, Integer> {
 
-    // Cấu hình các endPoint để ìm kiếm
+    // Cấu hình các endPoint để tìm kiếm
     // Containing: Để chỉ cần gõ vài ký tự đúng vẫn nhận (chứa key-word)
     // Có phân biệt chữ hoa và chữ thường
+
+    // 3 loại tìm kiếm
+
+    // Tìm kiếm theo tên sách
     Page<Sach> findByTenSachContaining(@RequestParam("tenSach") String tenSach, Pageable pageable);
+
+    // EndPoint: mã thể loại
+    Page<Sach> findByDanhSachTheLoai_MaTheLoai(@RequestParam("maTheLoai") int maTheLoai, Pageable pageable);
+
+    // EndPoint: mã thể loại và tên sách
+    Page<Sach> findByDanhSachTheLoai_MaTheLoaiAndTenSachContaining(@RequestParam("maTheLoai") int maTheLoai, @RequestParam("tenSach") String tenSach, Pageable pageable);
 }
